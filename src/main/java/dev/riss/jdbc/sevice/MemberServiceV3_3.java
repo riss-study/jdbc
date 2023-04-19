@@ -24,16 +24,20 @@ public class MemberServiceV3_3 {
 
     /** 트랜잭션 AOP 적용 전체 흐름
      * 1. 클라이언트(컨트롤러, 테스트케이스 등) 에서 AOP 프록시 호출
+     *
      * 2. AOP 프록시 내부에서 트랜잭션을 시작 (스프링 컨테이너를 통해 트랜잭션 매니저 획득)
      * => 미리 빈으로 등록된 트랜잭션 매니저 (ex. DataSourceTransactionManageR)
      * 3. transactionManager.getTransaction() 으로 트랜잭션을 시작!!
      * 4. 해당 메소드에 의해 데이터 소스로 커넥션 생성 (ex. dataSource.getConnection() )
      * 5. 해당 메소드에 의해 conn.setAutoCommit(false) 로 실제로 진짜 트랜잭션 시작 (수동 커밋 모드 활성화)
+     *
      * 6. 해당 커넥션을 트랜잭션동기화매니저(TransactionSynchronizationManager) 에 보관 (동기화해놈)
      * 7. 커넥션이 보관됨
+     *
      * 8. AOP 프록시에서 실제 서비스 로직을 호출 -> 서비스에서 비즈니스 로직 수행 -> 리포지토리 데이터 접근 로직 수행
-     * 9. 리포지토리에서 동기화된 커넥션을 꺼냄
+     * 9. 리포지토리에서 동기화된 커넥션을 꺼내서 데이터(DB) 처리
      * (DataSourceUtils.getConnection(dataSource) 수행하면 내부에서 TxSyncManager 를 통해 동기화된 커넥션을 획득)
+     *
      * 10. 다 끝나면 return -> ... -> return
      * 11. return 하면서 성공이면 commit, 예외가 발생하면 rollback 수행 후 최종 커넥션이 커넥션 풀로 반환됨 (풀이 없으면 커넥션 종료)
      *

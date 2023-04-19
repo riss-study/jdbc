@@ -11,7 +11,8 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import java.sql.SQLException;
 
 /**
- * Transaction - Transaction Manager (커넥션을 파라미터로 넘기지 않아도 됨)
+ * Transaction - Transaction Manager
+ * (하나의 DB 기술에 대한 종속성을 없애기 위해 추상화된 TxManager 를 이용, 커넥션을 파라미터로 넘기지 않아도 됨)
  * JDBC 기술에 의존하지 않는 서비스 로직 (대신 (Platform)TransactionManager interface 에 의존)
  * TransactionManager 구현체 DI(의존관계 주입)만 바꿔주면 다른 데이터 접근 기술(ex. JPA) 사용 가능
  * SQLException 의존성이 있지만, 이건 예외 문제 파트에서 나중에 해결
