@@ -1,12 +1,11 @@
 package dev.riss.jdbc.sevice;
 
-import dev.riss.jdbc.domain.Member;
+import dev.riss.jdbc.connection.domain.Member;
 import dev.riss.jdbc.repository.MemberRepositoryV2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 

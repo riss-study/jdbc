@@ -1,12 +1,9 @@
 package dev.riss.jdbc.sevice;
 
-import dev.riss.jdbc.domain.Member;
+import dev.riss.jdbc.connection.domain.Member;
 import dev.riss.jdbc.repository.MemberRepositoryV3;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.SQLException;

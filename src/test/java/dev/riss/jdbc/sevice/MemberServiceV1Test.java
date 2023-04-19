@@ -1,9 +1,7 @@
 package dev.riss.jdbc.sevice;
 
-import dev.riss.jdbc.connection.ConnectionConst;
-import dev.riss.jdbc.domain.Member;
+import dev.riss.jdbc.connection.domain.Member;
 import dev.riss.jdbc.repository.MemberRepositoryV1;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +13,6 @@ import java.sql.SQLException;
 import static dev.riss.jdbc.connection.ConnectionConst.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * 기본 동작, 트랜젝션이 없어서 문제 발생

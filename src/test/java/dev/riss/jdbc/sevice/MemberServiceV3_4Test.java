@@ -11,23 +11,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
-import static dev.riss.jdbc.connection.ConnectionConst.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Transaction - @Transactional
+ * Transaction - DataSource, TransactionManager 자동 등록
  */
 @SpringBootTest // 스프링 AOP 를 적용하려면 스프링 컨테이너가 필요. 테스트 시 스프링 부트를 통해 스프링 컨테이너 생성해주는 에노테이션
 @Slf4j
-class MemberServiceV3_3Test {
+class MemberServiceV3_4Test {
 
     public static final String MEMBER_A="memberA";
     public static final String MEMBER_B="memberB";
@@ -39,26 +35,24 @@ class MemberServiceV3_3Test {
     @Autowired
     private MemberServiceV3_3 memberService;
 
-    // @Transactional 은 스프링 빈에 등록돼있고 스프링 컨테이너에서 주입받아서 사용해야하기 때문에,
-    // 우리가 이용할 datasource, txManager, service, repository 모두 스프링 빈으로 등록해야함
-    // (스프링부트 쓰면 그럴 필요 없긴 함 -> 내가 빈으로 등록안했으면 자동으로 dataSource, transactionManager 리소스 빈으로 등록해줌)
-    // => application.yml 에 명시해주면 됨
-    @TestConfiguration      // Test 안에서 빈 등록해줌 (Test + @Configuration)
+    // 스프링 부트의 리소스 자동 등록 (DataSource, TransactionManager)
+    // application.properties(.yml) 에 지정된 속성을 참조하여
+    // DataSource 는 dataSource 라는 이름으로, PlatformTransactionManager 는 transactionManager 라는 이름으로 빈 자동 등록해줌
+    // 어떤 TxManager 를 설정할지는 현재 등록된 라이브러리를 보고 판단 (JDBC -> DatsSourceTxManager, JPA -> JPATxManager)
+    // 둘다 사용하면 JPATxManager 등록 (DataSourceTxManager 가 제공하는 기능 대부분 지원하기 때문)
+    // ** Tx -> 필자가 그냥 Transaction 을 줄여서 적었음 (실제 클래스는 (DataSource OR JPA)TransactionManager 가 맞음)
+    @TestConfiguration
     static class TestConfig {
-        @Bean
-        DataSource dataSource () {
-            return new DriverManagerDataSource(URL, USERNAME, PASSWORD);
-        }
 
-        // 트랙잭션 프록시도 결국 txManager 를 불러서 사용하는 것이기 때문에 txManager 를 Bean 으로 등록해야함
-        @Bean
-        PlatformTransactionManager transactionManager () {
-            return new DataSourceTransactionManager(dataSource());
+        private final DataSource dataSource;    // 스프링 컨테이너에 자동으로 등록된 빈 (RepositoryV3 생성때문에 주입받음)
+
+        public TestConfig(DataSource dataSource) {
+            this.dataSource = dataSource;
         }
 
         @Bean
         MemberRepositoryV3 memberRepositoryV3 () {
-            return new MemberRepositoryV3(dataSource());
+            return new MemberRepositoryV3(dataSource);
         }
 
         @Bean

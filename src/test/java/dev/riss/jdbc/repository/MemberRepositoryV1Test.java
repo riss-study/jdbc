@@ -1,7 +1,7 @@
 package dev.riss.jdbc.repository;
 
 import com.zaxxer.hikari.HikariDataSource;
-import dev.riss.jdbc.domain.Member;
+import dev.riss.jdbc.connection.domain.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
