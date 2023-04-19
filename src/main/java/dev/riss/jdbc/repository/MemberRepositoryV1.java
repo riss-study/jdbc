@@ -1,6 +1,6 @@
 package dev.riss.jdbc.repository;
 
-import dev.riss.jdbc.connection.domain.Member;
+import dev.riss.jdbc.domain.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.support.JdbcUtils;
 

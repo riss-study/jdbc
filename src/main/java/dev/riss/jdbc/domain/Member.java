@@ -1,4 +1,4 @@
-package dev.riss.jdbc.connection.domain;
+package dev.riss.jdbc.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

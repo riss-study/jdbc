@@ -1,6 +1,6 @@
 package dev.riss.jdbc.sevice;
 
-import dev.riss.jdbc.connection.domain.Member;
+import dev.riss.jdbc.domain.Member;
 import dev.riss.jdbc.repository.MemberRepositoryV1;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
