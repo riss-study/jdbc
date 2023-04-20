@@ -4,6 +4,7 @@ import dev.riss.jdbc.domain.Member;
 import dev.riss.jdbc.repository.MemberRepository;
 import dev.riss.jdbc.repository.MemberRepositoryV4_1;
 import dev.riss.jdbc.repository.MemberRepositoryV4_2;
+import dev.riss.jdbc.repository.MemberRepositoryV5;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +57,8 @@ class MemberServiceV4Test {
         @Bean
         MemberRepository memberRepository () {
 //            return new MemberRepositoryV4_1(dataSource);      // 직접 만든 MyDBException 으로 해결
-            return new MemberRepositoryV4_2(dataSource);        // 스프링이 제공하는 변환기를 통한 스프링 데이터 접근 예외 사용
+//            return new MemberRepositoryV4_2(dataSource);        // 스프링이 제공하는 변환기를 통한 스프링 데이터 접근 예외 사용
+            return new MemberRepositoryV5(dataSource);        // JdbcTemplate 사용
         }
 
         @Bean
