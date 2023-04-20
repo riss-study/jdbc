@@ -28,7 +28,13 @@ import static dev.riss.jdbc.connection.ConnectionConst.*;
  *
  * but, SQL ErrorCode 는 DB 마다 다 다름. 결국, DB 가 변경될 때마다 에러 코드도 변경해야 함. 에러코드는 수백가지가 있음
  *      ex. 키 중복 오류 코드는 H2:23505, MySQL:1062 로 다르다.
- * => 스프링이 이러한 각각 다른 DB 들의 예외를 추상화해서 제공해줌
+ * => 스프링이 이러한 각각 다른 DB 들의 예외를 추상화해서 제공해줌(스프링 제공 DB 관련 예외는 다 런타임 예외임)
+ * DataAccessException (스프링 데이터 접근 예외 최상위 계층) - NonTransient 예외, Transient 예외로 나뉨
+ * - Transient: 일시적 예외. 동일한 SQL 다시 시도 시 성공 가능성이 있는 예외
+ *      ex. 쿼리 타임아웃, 락 등 -> DB 상태가 좋아지거나, 락이 풀리면 성공할 수 있음
+ * - NonTransient: 같은 SQL 을 반복 시도하면 실패
+ *      ex. SQL 문법 오류, 데이터베이스 제약 조건 위배 등
+ * (** 스프링 메뉴얼에 정리가 잘 돼있지 않으므로, 직접 DataAccessException 코드 열어서 확인하는 걸 추천)
  */
 @SpringBootTest
 public class ExTranslatorV1Test {
