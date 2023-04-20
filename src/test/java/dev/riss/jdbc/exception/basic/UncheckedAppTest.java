@@ -32,6 +32,16 @@ public class UncheckedAppTest {
                 .isInstanceOf(Exception.class);
     }
 
+    @Test
+    void printEx () {
+        Controller controller = new Controller();
+        try {
+            controller.request();
+        } catch (Exception e) {
+            log.info("ex", e);
+        }
+    }
+
     static class Controller {
         Service service=new Service();
 
@@ -72,8 +82,15 @@ public class UncheckedAppTest {
                 runSQL();
             } catch (SQLException e) {      // 레포지토리 안에서는 SQLException 을 잡지만
                                             // 던질때는 만들어놓은 언체크 에러인 RuntimeSQLException 로 전환하여 던짐
-                throw new RuntimeSQLException(e);
+                throw new RuntimeSQLException(e);       // 기존 예의(e) 포함 --> 여기서는 기존의 java.sql.SQLException 을 포함
+                // 실제 로그 찍어보면 Caused by: java.sql.SQLException: ex 이래 찍힘 (이런 포함된 예외가 여러개면 Caused by 도 여러개 뜸)
+                // 주의!! 실무에서 이렇게 하려면 무조건 ~Exception(e) 으로 던져줘야 함.
+                // e 를 빠뜨리면 (기본 생성자) 어떤 예외때문에 이 예외가 발생했는지 알 수 없음
+                // SQLException 은 실제 뭐 때문에 잘못됀건지(ex. 쿼리, DB 어디 문제인지) 알려주는데, 기존의 e 를 안넣고 던지면
+                // 장애날 때, 로그에서 뭐가 문제인지 정확히 알 수 없다.
+                // 결론: 예외를 전환할 때는 꼭 예외를 포함시켜주자!!
             }
+            
         }
 
         public void runSQL () throws SQLException {
