@@ -3,6 +3,7 @@ package dev.riss.jdbc.sevice;
 import dev.riss.jdbc.domain.Member;
 import dev.riss.jdbc.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -28,8 +29,12 @@ public class MemberServiceV4 {
         Member fromMember = memberRepository.findById(fromId);
         Member toMember = memberRepository.findById(toId);
 
-        memberRepository.update(fromId, fromMember.getMoney() - money);
-
+        // 스프링 데이터 접근 예외를 활용한 복구 예시
+        try {
+            memberRepository.update(fromId, fromMember.getMoney() - money);
+        } catch (DuplicateKeyException e) {     // RepositoryV4_2에서 스프링 데이터 접근 예외로 변환해서 던져주기 때문에 가능
+            // 복구 로직
+        }
         validation(toMember);
 
         memberRepository.update(toId, toMember.getMoney() + money);
