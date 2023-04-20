@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * 체크 예외 -> 런테임 예외 변경 ==> 인터페이스, 서비스 계층의 순수성 유지 (의존관계 문제 해결)
  * => 향후 다른 DB 기술로 변경하더라도 서비스 계층의 코드 변경하지 않고 유지 가능
  *
- * but, 아직 예외를 구분하지 못함 (MyDbException 이라는 예외만 넘어오기 때문에). 특정 상황인 경우 복구 시도할 수 있어야 함.
+ * but, 아직 예외를 구분하지 못함 (MyDbException 이라는 예외만 넘어오기 때문에). 특정 상황인 경우 서비스계층에서 복구 시도하고 싶음.
  * 상황 별 예외를 구분하여 처리할 수 있어야 함.
  */
 @SpringBootTest
