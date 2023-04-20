@@ -1,6 +1,7 @@
 package dev.riss.jdbc.repository;
 
 import dev.riss.jdbc.domain.Member;
+import dev.riss.jdbc.repository.ex.MyDbException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -10,20 +11,22 @@ import java.sql.*;
 import java.util.NoSuchElementException;
 
 /**
- * Transaction - Transaction Manager
- * DataSourceUtils.getConnection()
- * DataSourceUtils.releaseConnection()
+ * 예외 누수 문제 해결
+ * 체크 예외를 런타임 예외로 변경
+ * MemberRepository 인터페이스 사용
+ * throws SQLException 제거
  */
 @Slf4j
-public class MemberRepositoryV3 implements MemberRepositoryEx {
+public class MemberRepositoryV4_1 implements MemberRepository {
 
     private final DataSource dataSource;
 
-    public MemberRepositoryV3(DataSource dataSource) {
+    public MemberRepositoryV4_1(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public Member save (Member member) throws SQLException {
+    @Override
+    public Member save (Member member) {
         String sql = "INSERT INTO member(member_id, money) VALUES (?, ?)";
 
         Connection conn=null;
@@ -41,17 +44,15 @@ public class MemberRepositoryV3 implements MemberRepositoryEx {
             return member;
 
         } catch (SQLException e) {
-
-            log.error("db error", e);
-            throw e;
-
+            throw new MyDbException(e);
         } finally {
             close(conn, pstmt, null);
         }
 
     }
 
-    public Member findById (String memberId) throws SQLException {
+    @Override
+    public Member findById (String memberId) {
         String sql = "SELECT * FROM member WHERE member_id = ?";
 
         Connection conn=null;
@@ -78,16 +79,14 @@ public class MemberRepositoryV3 implements MemberRepositoryEx {
             }
 
         } catch (SQLException e) {
-
-            log.error("db error", e);
-            throw e;
-
+            throw new MyDbException(e);
         } finally {
             close(conn, pstmt, rs);
         }
     }
 
-    public void update (String memberId, int money) throws SQLException {
+    @Override
+    public void update (String memberId, int money) {
         String sql = "UPDATE member SET money=? WHERE member_id=?";
 
         Connection conn=null;
@@ -103,16 +102,14 @@ public class MemberRepositoryV3 implements MemberRepositoryEx {
             log.info("resultSize (해당 쿼리를 통해 변경된 tuple(row) 수) = {}", resultSize);
 
         } catch (SQLException e) {
-
-            log.error("db error", e);
-            throw e;
-
+            throw new MyDbException(e);
         } finally {
             close(conn, pstmt, null);
         }
     }
 
-    public void delete (String memberId) throws SQLException {
+    @Override
+    public void delete (String memberId) {
         String sql = "DELETE FROM member WHERE member_id=?";
 
         Connection conn=null;
@@ -127,10 +124,7 @@ public class MemberRepositoryV3 implements MemberRepositoryEx {
             log.info("resultSize (해당 쿼리를 통해 삭제된 tuple(row) 수) = {}", resultSize);
 
         } catch (SQLException e) {
-
-            log.error("db error", e);
-            throw e;
-
+            throw new MyDbException(e);
         } finally {
             close(conn, pstmt, null);
         }
@@ -141,20 +135,12 @@ public class MemberRepositoryV3 implements MemberRepositoryEx {
 
         JdbcUtils.closeResultSet(rs);
         JdbcUtils.closeStatement(stmt);
-        // 주의! 트랜잭션 동기화를 사용하려면 DataSourceUtils 를 사용해야 함
-        // 트랜잭션을 사용하기 위해 동기화된 커넥션(트랜잭션 동기화 매니저에서 가져온 커넥션)은 커넥션을 닫지 않고 그대로 유지해준다.
-        // 트랜잭션 동기화 매니저가 관리하는 커넥션(그렇지 않은 커넥션)이 아닌 경우 해당 커넥션을 닫는다.
         DataSourceUtils.releaseConnection(conn, dataSource);
-//        JdbcUtils.closeConnection(conn);
         
     }
 
-    private Connection getConnection() throws SQLException {
-        // 주의! 트랜잭션 동기화를 사용하려면 DataSourceUtils 사용해야 함
-        // 트랜잭션 동기화 매니저가 관리하는 커넥션이 있으면, 해당 커넥션을 반환함
-        // 없는 경우, 새로운 커넥션을 생성해서 반환함
+    private Connection getConnection() {
         Connection conn = DataSourceUtils.getConnection(dataSource);
-//        Connection conn = dataSource.getConnection();
         log.info("get connection={}, class={}", conn, conn.getClass());
         return conn;
     }
